@@ -15,6 +15,7 @@ as in PDF. For the scripts to work, a version of Apache Spark must be accessible
 - lxml==5.3.0 (used for generating the metadata into a DDI 2.5 compliant XML file)
 - pyspark==3.5.1 (used for most data actions, executed on an Apache Spark instance)
 - pyspark==3.5.3 (used for most data actions, executed on an Apache Spark instance)
+- numpy==1.26.4 (in case of SPSS file, Spark is not compatible with numpy>2)
 
 To work with the scripts, please read the documentation within the code carefully. The scripts are numbered in terms of execution order. The first script copies the data into the bronze folder and updates the backbone with the changes, after it links the source data with the backbone identifiers and saves a full copy in the silver data. The second script, subsets the data and filters for specific elements prior to storing the speudonimized data into the gold folder. Finally the third script generates the XML and PDF metadata in DDI 2.5 compatible format.
 
