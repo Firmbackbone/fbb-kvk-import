@@ -1,0 +1,414 @@
+{
+    "study": {
+      "title": "FIRMBACKBONE Gold: Full Corporate Register",
+      "id": "FBB_20231221_KVK_Complete",
+      "producer": "FIRMBACKBONE Project",
+      "abstract": "The FIRMBACKBONE Gold: Full Corporate Register dataset consists of all the companies that are registered at the Dutch Chambers of Commerce. The data was obtained on December 12, 2023. Companies founded after this date and companies for which the entire bankruptcy process has ended and have no other legal liabilities pending (e.g. contractual commitments), are also removed from the dataset. The granularity level of this dataset is at the establishment level.",
+      "license_terms": "FIRMBACKBONE License"
+    },
+    "columns": {
+      "fbb_id": {
+        "description": "Observation based identifier (UUID), used for record linkage, unique for each company and establishment combination."
+      },
+      "fbb_grp_id": {
+        "description": "Firm based identifier (UUID), used for record linkage and firm-based lineage."
+      },
+      "fbb_est_id": {
+        "description": "Establishment based identifier (UUID), used for record linkage and establishment-based lineage. Although some registrations are not considered an establishment (a longterm physical firm location), each location still gets an identifier by FIRMBACKBONE."
+      },
+      "fbb_row_id": {
+        "description": "Row based identifier (UUID), primarily used for duplicate checking."
+      },
+      "fbb_file_id": {
+        "description": "File based identifier (UUID), used for tracking source file linage. For future reference, a file with the same code in its filename is stored in the bronze data location."
+      },
+      "fbb_wave_id": {
+        "description": "Date based identifier (YYYY-MM-DD) which is provided for each wave (containing the date of when the source snapshot was made)."
+      },
+      "fbb_updated": {
+        "description": "Date based column (YYYY-MM-DD) that holds the date when the record was added to the dataset."
+      },
+      "fbb_deleted": {
+        "description": "Date based column (YYYY-MM-DD) that holds the date when a new record was added that replaces the current row. The row is kept in the dataset for data lineage. This field should be blank exactluy once for wach unique fbb_id."
+      },
+      "hq_indicator": {
+        "description": "Indicates if the registered firm or establishment is considered the headquarter (H) or a subsidiary (N). In case there is only one establishment, there is no indication provided.",
+        "values": {
+          "H": "Headquarters",
+          "N": "Subsidiary"
+        }
+      },
+      "code_legal_form": {
+        "description": "Indicates the legal form of the registered company and establishment. Common legal forms are LLC (in Dutch B.V. and N.V.), cooperations and self-employed individuals.",
+        "values": {
+          "02": "Sole proprietorship with more than one owner", 
+          "05": "Shipping company", 
+          "07": "Partnership", 
+          "11": "General partnership", 
+          "21": "Limited partnership", 
+          "22": "Limited partnership with more than one managing partner (REPEALED)", 
+          "40": "Legal entity in the process of being formed", 
+          "41": "Private company with a normal structure", 
+          "42": "Private company according to the articles of association of a structured company", 
+          "51": "Public limited company with a normal structure", 
+          "52": "Public limited company according to the articles of association of a structured company", 
+          "53": "Public limited company investment company with variable capital", 
+          "55": "European public limited company (SE) with a normal structure", 
+          "61": "Cooperative", 
+          "62": "Cooperative according to the articles of association of a structured cooperative", 
+          "65": "Cooperative B.A. with normal structure", 
+          "70": "Owners association", 
+          "71": "Association with full legal capacity", 
+          "72": "Association with limited legal capacity", 
+          "73": "Church community", 
+          "74": "Foundation", 
+          "81": "Mutual guarantee society", 
+          "82": "Mutual guarantee society according to the articles of the statute of the structure mutual", 
+          "88": "Public legal person", 
+          "89": "Private legal person", 
+          "92": "Subsidiary investment with main investment abroad", 
+          "93": "European economic interest grouping", 
+          "94": "Foreign EC partnership with company in the Netherlands", 
+          "96": "Foreign partnership resembling EC partnership with company in the Netherlands"
+        }
+      },
+      "establishment_dissolved": {
+        "description": "Indicates if the establishment is active (00) or cancelled (80). The indicator will be blank in case no establishment is registered.",
+        "values": {
+          "00": "Active",
+          "80": "Cancelled"
+        }
+      },
+      "company_dissolved": {
+        "description": "Indicates if the company is active (00) or cancelled (80). The values in this indicator are mutually exclusive and collectively exhaustive.",
+        "values": {
+          "00": "Active",
+          "80": "Cancelled"
+        }
+      },
+      "code_status_legal": {
+        "description": "Indicates the status of a legal person, which can be active (00), suspension of payments (30), bankrupted (40), or cancelled (80). Then the orgaization is not a legal person, there is no status.",
+        "values": {
+          "00": "Active",
+          "30": "Suspension of Payments",
+          "40": "Bankrupted",
+          "80": "Cancelled"
+        }
+      },
+      "establishment_pc4": {
+        "description": "The first 4 digits of the postcal code of the establishment."
+      },
+      "establishment_city": {
+        "description": "Contains the name of the city or village in which the establishment is located."
+      },
+      "establishment_code_municipality": {
+        "description": "Contains the code of the municipality the establishment's city belongs to. These codes are retrieved from the Dutch base register of addresses and buildings (https://bagviewer.kadaster.nl/) and are compatible with Statistics Netherlands (https://www.cbs.nl/nl-nl/onze-diensten/methoden/classificaties/overig/gemeentelijke-indelingen-per-jaar/indeling-per-jaar/gemeentelijke-indeling-op-1-januari-2024), "
+      },
+      "correspondence_pc4": {
+        "description": "The first 4 digits of the postcal code of the correspondence address."
+      },
+      "correspondence_city": {
+        "description": "Contains the name of the city or village that is reported as the correspondence address."
+      },
+      "correspondence_code_municipality": {
+        "description": "Contains the code of the municipality the correspondence address' city is located in. When the correspondence address is in the Netherlands, the codes are retrieved from the Dutch base register of addresses and buildings (https://bagviewer.kadaster.nl/) and are compatible with Statistics Netherlands (https://www.cbs.nl/nl-nl/onze-diensten/methoden/classificaties/overig/gemeentelijke-indelingen-per-jaar/indeling-per-jaar/gemeentelijke-indeling-op-1-januari-2024), "
+      },
+      "correspondence_code_country": {
+        "description": "When the correspodence address is not in the Netherlands (code 0001) an alternative country code is provided. The country codes seem not to follow any standards.",
+        "values": {
+          "0001": "The Netherlabds",
+          "0002": "Belgium",
+          "0003": "France",
+          "0004": "Germany",
+          "0005": "Italy",
+          "0006": "Luxembourg",
+          "0007": "Monaco",
+          "0008": "Liechtenstein",
+          "0009": "San Marino",
+          "0020": "Channel Islands",
+          "0022": "United Kingdom",
+          "0024": "Iceland",
+          "0026": "Norway",
+          "0028": "Ireland",
+          "0030": "Sweden",
+          "0032": "Finland",
+          "0034": "Denmark",
+          "0036": "Switzerland",
+          "0038": "Austria",
+          "0040": "Portugal",
+          "0042": "Spain",
+          "0043": "Andorra",
+          "0046": "Malta",
+          "0047": "Bosnia and Herzegovina",
+          "0050": "Greece",
+          "0052": "Turkey",
+          "0053": "Estonia",
+          "0054": "Latvia",
+          "0055": "Lithuania",
+          "0057": "Armenia",
+          "0059": "Craotia",
+          "0060": "Poland",
+          "0061": "Georgia",
+          "0063": "Slovenia",
+          "0064": "Hungary",
+          "0066": "Romania",
+          "0067": "Czech Republic",
+          "0068": "Bulgaria",
+          "0069": "Slovakia",
+          "0070": "Albania",
+          "0082": "Faroe Islands",
+          "0083": "Gibraltar",
+          "0085": "Germany",
+          "0086": "Azerbaijan",
+          "0087": "Kazahstan",
+          "0089": "Moldova",
+          "0090": "Uzbekistan",
+          "0092": "Turkmenistan",
+          "0093": "Russia",
+          "0094": "Ukraine",
+          "0095": "Belarus",
+          "0096": "North Macedonia",
+          "0204": "Morocco",
+          "0212": "Tunisia",
+          "0216": "Libya",
+          "0220": "Egypt",
+          "0224": "Sudan",
+          "0232": "Mali",
+          "0247": "Cape Verde",
+          "0248": "Senegal",
+          "0264": "Sierra Leone",
+          "0272": "Ivory Coast",
+          "0273": "Burkina Faso",
+          "0276": "Ghana",
+          "0280": "Togo",
+          "0285": "Benin",
+          "0288": "Nigeria",
+          "0302": "Cameroon",
+          "0314": "Gabon",
+          "0318": "Kinshasa",
+          "0324": "Rwanda",
+          "0329": "Saint Helena",
+          "0330": "Angola",
+          "0334": "Ethiopia",
+          "0342": "Somalia",
+          "0346": "Kenya",
+          "0350": "Uganda",
+          "0352": "Tanzania",
+          "0355": "Seychelles",
+          "0366": "Mozambique",
+          "0373": "Mauritius",
+          "0378": "Zambia",
+          "0383": "Zimbabwe",
+          "0390": "South Africa",
+          "0391": "Botswana",
+          "0392": "Namibia",
+          "0400": "United States of America",
+          "0404": "Canada",
+          "0412": "Mexico",
+          "0413": "Bermuda",
+          "0416": "Guatemala",
+          "0422": "Belize",
+          "0428": "El Salvador",
+          "0432": "Nicaragua",
+          "0436": "Costa Rica",
+          "0440": "Panama",
+          "0451": "Democratic Republic of Congo",
+          "0453": "Bahama's",
+          "0456": "Dominican Republic",
+          "0458": "Cayman Islands",
+          "0464": "Jamaica",
+          "0467": "Puerto Rico",
+          "0468": "Nevis",
+          "0469": "Barbados",
+          "0474": "Aruba",
+          "0480": "Colombia",
+          "0484": "Venezuela",
+          "0492": "Suriname",
+          "0500": "Equador",
+          "0504": "Peru",
+          "0508": "Brazil",
+          "0512": "Chile",
+          "0516": "Bolivia",
+          "0520": "Paraguay",
+          "0524": "Uruguay",
+          "0528": "Argentina",
+          "0600": "Cyprus",
+          "0604": "Libanon",
+          "0608": "Syria",
+          "0612": "Iraq",
+          "0616": "Iran",
+          "0624": "Israel",
+          "0628": "Jordan",
+          "0632": "Saudi Arabia",
+          "0636": "Koeweit",
+          "0640": "Bahrain",
+          "0644": "Qatar",
+          "0647": "United Arab Emirates",
+          "0649": "Oman",
+          "0660": "Pakistan",
+          "0664": "India",
+          "0666": "Bangladesh",
+          "0670": "Sri Lanka",
+          "0672": "Nepal",
+          "0680": "Thailand",
+          "0687": "Vietnam",
+          "0696": "Cambodia",
+          "0700": "Indonesia",
+          "0701": "Malaysia",
+          "0706": "Singapore",
+          "0708": "Philippines",
+          "0720": "China",
+          "0728": "South Korea",
+          "0732": "Japan",
+          "0737": "Taiwan",
+          "0800": "Australia",
+          "0804": "New Zealand",
+          "0817": "Tonga",
+          "5103": "Serbia",
+          "5104": "Montenegro",
+          "5105": "Kosovo",
+          "5106": "Bonaire",
+          "5107": "Curacao",
+          "5110": "Saint Martin",
+          "7030": "British Virgin Islands",
+          "8035": "Isle of Man",
+          "8036": "British West Indies",
+          "8045": "Antigua and Barbuda",
+          "9056": "Marshall Islands",
+          "9090": "Vanuatu"
+        }
+      },
+      "employees_fulltime": {
+        "description": "The number of people registered at the establishment as fulltime employee (see: https://www.kvk.nl/wijzigen/werkzame-personen-registreren-in-het-handelsregister/). This includes employeed, but also externally hired people and temporary workers, who work at least 15 hours per week at this company."
+      },
+      "employees_parttime": {
+        "description": "The number of people registered at the establishment as parttime employee (see: https://www.kvk.nl/wijzigen/werkzame-personen-registreren-in-het-handelsregister/). This includes employeed, but also externally hired people and temporary workers, who work at most 15 hours per week at this company."
+      },
+      "employees_total": {
+        "description": "The number of people registered at the establishment, disregarding the hours of appointment (it should sum the employee_fulltime and employee_parttime)."
+      },
+      "year_employees": {
+        "description": "The year in which the number of employees were reported."
+      },
+      "month_employees": {
+        "description": "The month in which the number of employees were reported."
+      },
+      "employment_total": {
+        "description": "The number of people registered at the company, disregarding the hours of appointment (it should sum the employee_fulltime and employee_parttime)."
+      },
+      "year_employment": {
+        "description": "The year in which the numver of employees at company level were reported."
+      },
+      "month_employment": {
+        "description": "The month in which the numver of employees at company level were reported."
+      },
+      "code_sbi_1": {
+        "description": "This indicators provides the primary standard business category code (see: https://www.kvk.nl/en/about-the-business-register/overview-standard-business-categories-sbi-codes/)."
+      },
+      "code_sbi_2": {
+        "description": "This indicators provides the secondary standard business category code (see: https://www.kvk.nl/en/about-the-business-register/overview-standard-business-categories-sbi-codes/)."
+      },
+      "code_sbi_3": {
+        "description": "This indicators provides the tertiary standard business category code (see: https://www.kvk.nl/en/about-the-business-register/overview-standard-business-categories-sbi-codes/)."
+      },
+      "economically_active": {
+        "description": "Whenever a company has an establishment that is not a financial holding company, nor an investment company, and the company size (based on employees) is known, is considered not financially active.",
+        "values": {
+          "0": "Not economically active",
+          "1": "Economically active"
+        }
+      },
+      "indication_import": {
+        "description": "Commerical companies with a legal personality need to comply with specific rules when importing goods. Whether this company needs to follow these rules is indicated here.",
+        "values": {
+          "J": "The company is considered an importer",
+          "N": "The company is not considered an importer"
+        }
+      },
+      "indication_export": {
+        "description": "Commerical companies with a legal personality need to comply with specific rules when exporting goods. Whether this company needs to follow these rules is indicated here.",
+        "values": {
+          "J": "The company is considered an exporter",
+          "N": "The company is not considered an exporter"
+        }
+      },
+      "year_founded": {
+        "description": "The year in which the company was founded."
+      },
+      "month_founded": {
+        "description": "The month in whcih the company was founded."
+      },
+      "year_on_deed": {
+        "description": "The year the deed of incorporation was drawn up."
+      },
+      "month_on_deed": {
+        "description": "The month the deed of incorporation was drawn up."
+      },
+      "year_registration": {
+        "description": "The year the company was registered at the Dutch Chambers of Commerce."
+      },
+      "month_registration": {
+        "description": "The month the company was registered at the Dutch Chambers of Commerce."
+      },
+      "year_cancellation": {
+        "description": "The year in which the company was dissolved."
+      },
+      "month_cancellation": {
+        "description": "The month in which the company was dissolved."
+      },
+      "year_establishment_reported": {
+        "description": "The year in which the establishment was reported at the Chamber of Commerce."
+      },
+      "month_establishment_reported": {
+        "description": "The month in which the establishment was reported at the Chamber of Commerce."
+      },
+      "year_initial_establishment": {
+        "description": "The year in which the establishment was initially established."
+      },
+      "month_initial_establishment": {
+        "description": "The month in which the establishment was initially established."
+      },
+      "year_current_establishment": {
+        "description": "The year since when the last change of the establishment took place."
+      },
+      "month_current_establishment": {
+        "description": "The month since when the last change of the establishment took place."
+      },
+      "year_continuation": {
+        "description": "The year when the company was continued after requesting suspension of payment."
+      },
+      "month_continuation": {
+        "description": "The month when the company was continued after requesting suspension of payment."
+      },
+      "year_request_suspension": {
+        "description": "The year when the company requested a suspension of payment."
+      },
+      "month_request_suspension": {
+        "description": "The month when the company requested a suspension of payment."
+      },
+      "year_active_suspension": {
+        "description": "The year when the suspension of payment was granted by the court."
+      },
+      "month_active_suspension": {
+        "description": "The month when the suspension of payment was granted by the court."
+      },
+      "year_request_bankruptcy": {
+        "description": "The year when the company requested a bankruptcy."
+      },
+      "month_request_bankruptcy": {
+        "description": "The month when the company requested a bankruptcy."
+      },
+      "year_active_bankruptcy": {
+        "description": "The year when the court approved the bankruptcy."
+      },
+      "month_active_bankruptcy": {
+        "description": "The month when the court approved the bankruptcy."
+      },
+      "year_provisioning_report": {
+        "description": "The year in which the latest financial reports were deposited."
+      },
+      "month_provisioning_report": {
+        "description": "The month in which the latest financial reports were deposited."
+      }
+    }
+  }
