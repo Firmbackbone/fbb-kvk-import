@@ -1,9 +1,9 @@
 {
     "study": {
-      "title": "FIRMBACKBONE Gold: Full Corporate Register",
+      "title": "FIRMBACKBONE: Full Corporate Register",
       "id": "FBB_20231221_KVK_Complete",
-      "producer": "FIRMBACKBONE Project",
-      "abstract": "The FIRMBACKBONE Gold: Full Corporate Register dataset consists of all the companies that are registered at the Dutch Chambers of Commerce. The data was obtained on December 12, 2023. Companies founded after this date and companies for which the entire bankruptcy process has ended and have no other legal liabilities pending (e.g. contractual commitments), are also removed from the dataset. The granularity level of this dataset is at the establishment level.",
+      "producer": "FIRMBACKBONE",
+      "abstract": "The FIRMBACKBONE: Full Corporate Register dataset consists of all the companies that are registered at the Dutch Chambers of Commerce. The data was obtained on December 12, 2023. Companies founded after this date and companies for which the entire bankruptcy process has ended and have no other legal liabilities pending (e.g. contractual commitments), are also removed from the dataset. The granularity level of this dataset is at the establishment level. In general, using employment data from this dataset is discouraged since there is not legal obligation to keep this data up-to-date, especially since alternative datasets are available in FIRMBACKBONE with better quality and more detailed employment information.",
       "license_terms": "FIRMBACKBONE License"
     },
     "columns": {
@@ -14,7 +14,7 @@
         "description": "Firm based identifier (UUID), used for record linkage and firm-based lineage."
       },
       "fbb_est_id": {
-        "description": "Establishment based identifier (UUID), used for record linkage and establishment-based lineage. Although some registrations are not considered an establishment (a longterm physical firm location), each location still gets an identifier by FIRMBACKBONE."
+        "description": "Establishment based identifier (UUID), used for record linkage and establishment-based lineage. Although some registrations are not considered an establishment (a long-term physical firm location), each location still gets an identifier by FIRMBACKBONE."
       },
       "fbb_row_id": {
         "description": "Row based identifier (UUID), primarily used for duplicate checking."
@@ -29,7 +29,7 @@
         "description": "Date based column (YYYY-MM-DD) that holds the date when the record was added to the dataset."
       },
       "fbb_deleted": {
-        "description": "Date based column (YYYY-MM-DD) that holds the date when a new record was added that replaces the current row. The row is kept in the dataset for data lineage. This field should be blank exactluy once for wach unique fbb_id."
+        "description": "Date based column (YYYY-MM-DD) that holds the date when a new record was added that replaces the current row. The row is kept in the dataset for data lineage. This field should be blank exactly once for each unique fbb_id."
       },
       "hq_indicator": {
         "description": "Indicates if the registered firm or establishment is considered the headquarter (H) or a subsidiary (N). In case there is only one establishment, there is no indication provided.",
@@ -39,8 +39,9 @@
         }
       },
       "code_legal_form": {
-        "description": "Indicates the legal form of the registered company and establishment. Common legal forms are LLC (in Dutch B.V. and N.V.), cooperations and self-employed individuals.",
+        "description": "Indicates the legal form of the registered company and establishment. Common legal forms are LLC (in Dutch B.V. and N.V.), co-operations and self-employed individuals.",
         "values": {
+		  "01": "Sole proprietorship",
           "02": "Sole proprietorship with more than one owner", 
           "05": "Shipping company", 
           "07": "Partnership", 
@@ -87,7 +88,7 @@
         }
       },
       "code_status_legal": {
-        "description": "Indicates the status of a legal person, which can be active (00), suspension of payments (30), bankrupted (40), or cancelled (80). Then the orgaization is not a legal person, there is no status.",
+        "description": "Indicates the status of a legal person, which can be active (00), suspension of payments (30), bankrupted (40), or cancelled (80). Then the organization is not a legal person, there is no status.",
         "values": {
           "00": "Active",
           "30": "Suspension of Payments",
@@ -95,8 +96,72 @@
           "80": "Cancelled"
         }
       },
+      "code_registration": {
+        "description": "Indicates the reason for registering the company at the Chamber of Commerce.",
+        "values": {
+          "01": "Correction of dissolution",
+          "02": "Chamber boundary change",
+          "03": "Amendment to law",
+          "05": "Legal form or activity change",
+		  "06": "Change of main/branch establishment",
+		  "07": "New establishment (general establishment)",
+		  "08": "New establishment (start-up company)",
+		  "09": "Post-registration",
+		  "31": "Continuation",
+		  "32": "Continuation of branch establishment (expired)",
+		  "33": "Split-off (expired)",
+		  "34": "Merger of company or branch establishment (expired)",
+		  "42": "Relocation across chamber boundary",
+		  "43": "Relocation within chamber district"
+        }
+      },
+      "code_cancellation": {
+        "description": "Indicates the reason for cancelling the company at the Chamber of Commerce. A company can be cancelled but remains registered at the Chamber of Commerce.",
+        "values": {
+          "01": "Administrative reasons",
+          "02": "No reason given",
+		  "03": "Ex officio cancellation",
+		  "05": "Transfer of company",
+		  "10": "Bankruptcy",
+		  "16": "Other reasons",
+		  "59": "Moved",
+		  "99": "Termination of registration"
+        }
+      },
+      "code_deregistration": {
+        "description": "Indicates the reason for de-registering the company at the chambers of commerce. A company cannot be deregistered from the Chamber of Commerce without being cancelled.",
+        "values": {
+          "21": "Rectification",
+          "24": "Ex officio cancellation",
+          "25": "Legal form moved to foreign country",
+          "26": "Main establishment becomes branch",
+          "27": "Dissolution (general)",
+          "28": "Dissolution (bankruptcy)",
+          "29": "Post-de-registration",
+          "31": "Transfer of entire company (expired)",
+          "32": "Transfer",
+          "34": "Merger (expired)",
+          "44": "Relocation across chamber boundary",
+          "81": "No known assets present with legal entity",
+          "91": "Termination of registration"
+        }
+      },
+      "code_dissolution": {
+        "description": "Indicates the reason for dissolution of the company at the Chamber of Commerce.",
+        "values": {
+          "01": "Resolution of the general meeting/foundation board",
+          "02": "Court ruling",
+          "03": "Statutory provision",
+          "04": "State of insolvency",
+          "05": "Termination of bankruptcy due to the state of the estate",
+          "06": "Complete absence of members",
+          "08": "Resignation of one or more partners/partners",
+          "10": "Other reasons",
+          "12": "Dissolution by the Chamber of Commerce"
+        }
+      },
       "establishment_pc4": {
-        "description": "The first 4 digits of the postcal code of the establishment."
+        "description": "The first 4 digits of the postal code of the establishment."
       },
       "establishment_city": {
         "description": "Contains the name of the city or village in which the establishment is located."
@@ -105,18 +170,18 @@
         "description": "Contains the code of the municipality the establishment's city belongs to. These codes are retrieved from the Dutch base register of addresses and buildings (https://bagviewer.kadaster.nl/) and are compatible with Statistics Netherlands (https://www.cbs.nl/nl-nl/onze-diensten/methoden/classificaties/overig/gemeentelijke-indelingen-per-jaar/indeling-per-jaar/gemeentelijke-indeling-op-1-januari-2024), "
       },
       "correspondence_pc4": {
-        "description": "The first 4 digits of the postcal code of the correspondence address."
+        "description": "The first 4 digits of the postal code of the correspondence address."
       },
       "correspondence_city": {
         "description": "Contains the name of the city or village that is reported as the correspondence address."
       },
       "correspondence_code_municipality": {
-        "description": "Contains the code of the municipality the correspondence address' city is located in. When the correspondence address is in the Netherlands, the codes are retrieved from the Dutch base register of addresses and buildings (https://bagviewer.kadaster.nl/) and are compatible with Statistics Netherlands (https://www.cbs.nl/nl-nl/onze-diensten/methoden/classificaties/overig/gemeentelijke-indelingen-per-jaar/indeling-per-jaar/gemeentelijke-indeling-op-1-januari-2024), "
+        "description": "Contains the code of the municipality to which the correspondence address belongs. When the correspondence address is in the Netherlands, the codes are retrieved from the Dutch base register of addresses and buildings (https://bagviewer.kadaster.nl/) and are compatible with Statistics Netherlands (https://www.cbs.nl/nl-nl/onze-diensten/methoden/classificaties/overig/gemeentelijke-indelingen-per-jaar/indeling-per-jaar/gemeentelijke-indeling-op-1-januari-2024), "
       },
       "correspondence_code_country": {
-        "description": "When the correspodence address is not in the Netherlands (code 0001) an alternative country code is provided. The country codes seem not to follow any standards.",
+        "description": "When the correspondence address is not in the Netherlands (code 0001) an alternative country code is provided. These country codes do not follow a public standard.",
         "values": {
-          "0001": "The Netherlabds",
+          "0001": "The Netherlands",
           "0002": "Belgium",
           "0003": "France",
           "0004": "Germany",
@@ -146,7 +211,7 @@
           "0054": "Latvia",
           "0055": "Lithuania",
           "0057": "Armenia",
-          "0059": "Craotia",
+          "0059": "Croatia",
           "0060": "Poland",
           "0061": "Georgia",
           "0063": "Slovenia",
@@ -160,7 +225,7 @@
           "0083": "Gibraltar",
           "0085": "Germany",
           "0086": "Azerbaijan",
-          "0087": "Kazahstan",
+          "0087": "Kazakhstan",
           "0089": "Moldova",
           "0090": "Uzbekistan",
           "0092": "Turkmenistan",
@@ -213,7 +278,7 @@
           "0436": "Costa Rica",
           "0440": "Panama",
           "0451": "Democratic Republic of Congo",
-          "0453": "Bahama's",
+          "0453": "Bahamas",
           "0456": "Dominican Republic",
           "0458": "Cayman Islands",
           "0464": "Jamaica",
@@ -224,7 +289,7 @@
           "0480": "Colombia",
           "0484": "Venezuela",
           "0492": "Suriname",
-          "0500": "Equador",
+          "0500": "Ecuador",
           "0504": "Peru",
           "0508": "Brazil",
           "0512": "Chile",
@@ -233,14 +298,14 @@
           "0524": "Uruguay",
           "0528": "Argentina",
           "0600": "Cyprus",
-          "0604": "Libanon",
+          "0604": "Lebanon",
           "0608": "Syria",
           "0612": "Iraq",
           "0616": "Iran",
           "0624": "Israel",
           "0628": "Jordan",
           "0632": "Saudi Arabia",
-          "0636": "Koeweit",
+          "0636": "Kuwait",
           "0640": "Bahrain",
           "0644": "Qatar",
           "0647": "United Arab Emirates",
@@ -278,11 +343,14 @@
           "9090": "Vanuatu"
         }
       },
+	  "correspodence_iso3c" : {
+		  "description": "Correspondence country, converted into the ISO 3166-1 alpha-3 country codes (ISO3c). Since the chamber of commerce codes do not follow the ISO standards, there are some exceptions: Guernsey (GGN) and Jersey (JEY) are considered the Channel Islands and hence only the GGN code is used here. Also Kosovo is not registered as separate ISO3c code and hence its default alternative XKX is used instead. When no country is defined, the code UDF for undefined is used."
+	  },
       "employees_fulltime": {
-        "description": "The number of people registered at the establishment as fulltime employee (see: https://www.kvk.nl/wijzigen/werkzame-personen-registreren-in-het-handelsregister/). This includes employeed, but also externally hired people and temporary workers, who work at least 15 hours per week at this company."
+        "description": "The number of people registered at the establishment as full-time employee (see: https://www.kvk.nl/wijzigen/werkzame-personen-registreren-in-het-handelsregister/). This includes employees, but also externally hired people and temporary workers, who work at least 15 hours per week at this company."
       },
       "employees_parttime": {
-        "description": "The number of people registered at the establishment as parttime employee (see: https://www.kvk.nl/wijzigen/werkzame-personen-registreren-in-het-handelsregister/). This includes employeed, but also externally hired people and temporary workers, who work at most 15 hours per week at this company."
+        "description": "The number of people registered at the establishment as part-time employee (see: https://www.kvk.nl/wijzigen/werkzame-personen-registreren-in-het-handelsregister/). This includes employees, but also externally hired people and temporary workers, who work at most 15 hours per week at this company."
       },
       "employees_total": {
         "description": "The number of people registered at the establishment, disregarding the hours of appointment (it should sum the employee_fulltime and employee_parttime)."
@@ -297,10 +365,10 @@
         "description": "The number of people registered at the company, disregarding the hours of appointment (it should sum the employee_fulltime and employee_parttime)."
       },
       "year_employment": {
-        "description": "The year in which the numver of employees at company level were reported."
+        "description": "The year in which the number of employees at company level were reported."
       },
       "month_employment": {
-        "description": "The month in which the numver of employees at company level were reported."
+        "description": "The month in which the number of employees at company level were reported."
       },
       "code_sbi_1": {
         "description": "This indicators provides the primary standard business category code (see: https://www.kvk.nl/en/about-the-business-register/overview-standard-business-categories-sbi-codes/)."
@@ -312,7 +380,7 @@
         "description": "This indicators provides the tertiary standard business category code (see: https://www.kvk.nl/en/about-the-business-register/overview-standard-business-categories-sbi-codes/)."
       },
       "economically_active": {
-        "description": "Whenever a company has an establishment that is not a financial holding company, nor an investment company, and the company size (based on employees) is known, is considered not financially active.",
+        "description": "Whenever a company has an establishment that is not a financial holding company, nor an investment company, and the company size (based on employees) is known, is considered not economically active.",
         "values": {
           "0": "Not economically active",
           "1": "Economically active"
@@ -336,7 +404,7 @@
         "description": "The year in which the company was founded."
       },
       "month_founded": {
-        "description": "The month in whcih the company was founded."
+        "description": "The month in which the company was founded."
       },
       "year_on_deed": {
         "description": "The year the deed of incorporation was drawn up."

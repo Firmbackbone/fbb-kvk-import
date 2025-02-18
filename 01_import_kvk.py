@@ -23,7 +23,7 @@ COLOUR_REST = Fore.RESET + Back.RESET
 print(COLOUR_HEAD + '-' * t_width + COLOUR_REST)
 print(COLOUR_HEAD + '  Utrecht University    '.ljust(t_width) + COLOUR_REST)
 print(COLOUR_HEAD + '  FIRMBACKBONE v3.00    '.ljust(t_width) + COLOUR_REST)
-print(COLOUR_HEAD + '  20241119: KVK import  '.ljust(t_width) + COLOUR_REST)
+print(COLOUR_HEAD + '  20241119 - KVK import  '.ljust(t_width) + COLOUR_REST)
 print(COLOUR_HEAD + f'  Start: {datetime.datetime.now()}'.ljust(t_width) + COLOUR_REST)
 print(COLOUR_HEAD + '-' * t_width + COLOUR_REST)
 
@@ -41,6 +41,7 @@ file_id = str(uuid.uuid4())
 # source_file = 'BASIS.csv'
 # # source_file = 'basis_sample_extra.csv'
 # source_wave = '2023-12-21'
+# source_provider = 'kvk'
 # target_location = 'C:/Users/5775620/Documents/FirmBackbone/pySpark_ETL/'
 # target_file = '20231221_kvk'
 # create_backbone = True
@@ -52,10 +53,12 @@ file_id = str(uuid.uuid4())
 source_location = 'C:/Users/5775620/Documents/FirmBackbone/fbb-data/20240205 - KvK/'
 source_file = 'BASIS.csv'
 source_wave = '2024-02-05'
+source_provider = 'kvk'
 target_location = 'C:/Users/5775620/Documents/FirmBackbone/pySpark_ETL/'
 target_file = '20240205_kvk'
 create_backbone = False
 backbone_location = 'C:/Users/5775620/Documents/FirmBackbone/pySpark_ETL/'
+# backbone_file = 'backbone_20231221'
 backbone_file = 'backbone_20231221'
 source_backup = 'C:/Users/5775620/Documents/FirmBackbone/pySpark_ETL/'
 
@@ -67,7 +70,10 @@ print(COLOUR_TASK + f'>>> {datetime.datetime.now()} :: Backup source file...'.lj
 os.makedirs(os.path.dirname(source_backup + 'bronze/'), exist_ok=True)
 shutil.copyfile(source_location + source_file, 
                 source_backup + 'bronze/' + f'{file_id}_{source_file}')
-with open(source_location + f'{file_id}_{source_file}.txt', "w"):
+with open(source_location + f'{file_id}_{source_file}.txt', "w") as source_log:
+    source_log.write(f'Timestamp: {datetime.datetime.now()}\n')
+    source_log.write(f'Processed: {source_file}\n')
+    source_log.write(f'Processor: 20241119 - KVK import\n')
     pass
 
 print(COLOUR_TASK + f'>>> {datetime.datetime.now()} :: Initialize Spark...'.ljust(t_width) + COLOUR_REST)
@@ -94,6 +100,8 @@ options = {
 }
 src = spark.read.options(**options).csv(source_backup + f'bronze/{file_id}_{source_file}')
 
+print(COLOUR_HEAD + f'!!! Counted rows after initial loading: {src.count()}'.ljust(t_width) + COLOUR_REST) 
+
 ########################################################################
 ### Process source data
 ########################################################################
@@ -116,6 +124,8 @@ src = fbb.df_col_cleanup(src)
 print(COLOUR_TASK + f'>>> {datetime.datetime.now()} :: Implementing KVK specific requirements...'.ljust(t_width) + COLOUR_REST)
 print(COLOUR_STEP + f'    {datetime.datetime.now()} :: Dropping 0s from the annualy report years...'.ljust(t_width) + COLOUR_REST)
 src = src.withColumn('annual_report_year', when(col('annual_report_year') == 0, None).otherwise(col('annual_report_year')))
+print(COLOUR_STEP + f'    {datetime.datetime.now()} :: Converting country codes to ISO3c...'.ljust(t_width) + COLOUR_REST)
+src = fbb.df_create_iso3c(src)
 
 # Specific FBB related transformations
 print(COLOUR_TASK + f'>>> {datetime.datetime.now()} :: Implementing FBB strcutural requirements...'.ljust(t_width) + COLOUR_REST)
@@ -124,7 +134,7 @@ src = fbb.df_create_postcodes(src)
 print(COLOUR_STEP + f'    {datetime.datetime.now()} :: Dropping exact duplicate rows...'.ljust(t_width) + COLOUR_REST)
 src = fbb.df_drop_duplicates(src)
 print(COLOUR_STEP + f'    {datetime.datetime.now()} :: Initializing standard backbone columns...'.ljust(t_width) + COLOUR_REST)
-src = fbb.df_create_fbb_cols(src, wave_date=source_wave, overwrite=True, file_id=file_id, data_source='kvk')
+src = fbb.df_create_fbb_cols(src, wave_date=source_wave, overwrite=True, file_id=file_id, data_source=source_provider)
 print(COLOUR_STEP + f'    {datetime.datetime.now()} :: Calculating column for latest change date...'.ljust(t_width) + COLOUR_REST)
 src = fbb.df_create_last_update(src)
 print(COLOUR_TASK + f'>>> {datetime.datetime.now()} :: Calculating column for combined address...'.ljust(t_width) + COLOUR_REST)
@@ -147,7 +157,7 @@ if create_backbone:
             'case_id', 'establishment_id', 'hq_indicator', 'company_name', 'establishment_name', 'partnership_name', 'code_legal_form', 'description_legal_form', 
             'establishment_dissolved', 'company_dissolved', 'code_status_legal', 
             'establishment_street', 'establishment_number', 'establishment_extension', 'establishment_postcode', 'establishment_pc4', 'establishment_city', 'establishment_code_municipality', 
-            'correspondence_street', 'correspondence_number', 'correspondence_extension', 'correspondence_postcode', 'correspondence_pc4', 'correspondence_city', 'correspondence_code_municipality', 'correspondence_code_country', 
+            'correspondence_street', 'correspondence_number', 'correspondence_extension', 'correspondence_postcode', 'correspondence_pc4', 'correspondence_city', 'correspondence_code_municipality', 'correspondence_code_country', 'correspondence_code_iso3c',
             'kvk_city', 'employees_fulltime', 'employees_parttime', 'employees_total', 'date_employees', 'employment_total', 'date_employment', 
             'code_sbi_1', 'code_sbi_2', 'code_sbi_3', 'economically_active', 
             'registered_corporate_structure', 'indication_import', 'indication_export', 'date_founded', 'date_on_deed', 'date_registration', 'code_registration', 'date_cancellation', 'code_cancellation', 'code_deregistration', 'code_dissolution', 
@@ -205,6 +215,7 @@ src = fbb.df_exact_match(x = src, y = bb,
                          override_matches = True,
                          allow_nulls = False)
 
+
 # Records that do not have an fbb_id assigned based on the case_id and
 # establishment_id matching, are either not correctly matched, do not
 # have an establishment_id assigned, or are not registered in the backbone. 
@@ -261,6 +272,8 @@ print(COLOUR_STEP + f'    {datetime.datetime.now()} :: Writing separate dataset 
 src = src.filter(src.fbb_id.isNotNull())
 src.repartition(1).write.mode('overwrite').parquet(target_location + 'silver/' + target_file + '_full')
 
+print(COLOUR_HEAD + f'!!! Written rows to silver data: {src.count()}'.ljust(t_width) + COLOUR_REST) 
+
 ########################################################################
 ### Stop the Spark session
 ########################################################################
@@ -269,7 +282,7 @@ spark.catalog.clearCache()
 spark.stop()
 
 print(COLOUR_HEAD + '-' * t_width + COLOUR_REST)
-print(COLOUR_HEAD + '  20241119: KVK import completed! '.ljust(t_width) + COLOUR_REST)
+print(COLOUR_HEAD + '  20241119 - KVK import completed! '.ljust(t_width) + COLOUR_REST)
 print(COLOUR_HEAD + f'  Finish: {datetime.datetime.now()}'.ljust(t_width) + COLOUR_REST)
 print(COLOUR_HEAD + '-' * t_width + COLOUR_REST)
 

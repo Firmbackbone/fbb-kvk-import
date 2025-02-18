@@ -36,10 +36,13 @@ print(COLOUR_TASK + f'>>> {datetime.datetime.now()} :: Loading configuration...'
 
 # Paths to input files
 file_location = 'C:/Users/5775620/Documents/FirmBackbone/pySpark_ETL/gold/'
-source_file = '20231221_kvk_legal_profit'
+# source_file = '20241203_lisa_2021_complete'
+source_file = '20231221_kvk_complete'
 codebook_xml_file = f'ddi_{source_file}.xml'
 codebook_pdf_file = f'ddi_{source_file}.pdf'
 metadata_json = f'ddi_{source_file}.json'
+# force_utf8 = True
+# force_latin1 = True
 
 print(COLOUR_TASK + f'>>> {datetime.datetime.now()} :: Initialize Spark...'.ljust(t_width) + COLOUR_REST)
 findspark.init('c:/spark')
@@ -48,8 +51,10 @@ spark = SparkSession.builder \
     .config('spark.driver.memory', '60g') \
     .config('spark.sql.parquet.datetimeRebaseModeInWrite', 'CORRECTED') \
     .config('spark.worker.cleanup.enabled', 'true') \
-    .getOrCreate()    
-
+    .config('spark.sql.execution.arrow.pyspark.fallback.enabled', 'true') \
+    .getOrCreate()
+    
+    
 ########################################################################
 ### Initialize data
 ########################################################################
@@ -65,6 +70,17 @@ with open(file_location + metadata_json, "r") as f:
 ### Helper functions
 ########################################################################
 
+def get_dir_size(start_path = '.'):
+    print(f'    {datetime.datetime.now()} :: Retrieving directory size...')
+    total_size = 0
+    for dirpath, dirnames, filenames in os.walk(start_path):
+        for f in filenames:
+            fp = os.path.join(dirpath, f)
+            # skip if it is symbolic link
+            if not os.path.islink(fp):
+                total_size += os.path.getsize(fp)
+    return total_size
+
 def get_file_size(file_path):
     print(f'    {datetime.datetime.now()} :: Retrieving file size...')
     return os.path.getsize(file_path)
@@ -73,14 +89,47 @@ def compute_statistics(column_name, column_data_type):
     print(f'    {datetime.datetime.now()} :: Calculating statistics for column {column_name}...')
     stats = {}
     if column_data_type in ["int", "bigint", "double", "float"]:
-        stats["min"] = df.select(F.min(column_name)).collect()[0][0]
-        stats["max"] = df.select(F.max(column_name)).collect()[0][0]
-        stats["mean"] = df.select(F.mean(column_name)).collect()[0][0]
-        stats["stddev"] = df.select(F.stddev(column_name)).collect()[0][0]
+        #stats["min"] = df.select(F.min(column_name)).collect()[0][0]
+        #stats["max"] = df.select(F.max(column_name)).collect()[0][0]
+        stats["mean"] = df.select(F.round(F.mean(column_name), 3)).collect()[0][0]
+        stats["median"] = df.select(F.round(F.median(column_name), 3)).collect()[0][0]
+        stats["stddev"] = df.select(F.round(F.stddev(column_name), 3)).collect()[0][0]
+        stats["skewness"] = df.select(F.round(F.skewness(column_name), 3)).collect()[0][0]
+        stats["null_count"] = df.filter(F.col(column_name).isNull()).count()
     elif column_data_type in ["string"]:
         stats["distinct_count"] = df.select(column_name).distinct().count()
         stats["null_count"] = df.filter(F.col(column_name).isNull()).count()
+    else:
+        stats["null_count"] = df.filter(F.col(column_name).isNull()).count()
     return stats
+
+# def compute_distribution(column_name, column_data_type, bins=8):
+#     print(f'    {datetime.datetime.now()} :: Calculating statistics for column {column_name}...')
+#     dist = {}
+#     if column_data_type in ["int", "bigint", "double", "float"]:
+#         dist_min = df.select(F.min(column_name)).collect()[0][0]
+#         dist_max = df.select(F.max(column_name)).collect()[0][0]
+#         dist_len = dist_max - dist_min
+#         dist_stp = dist_len / (bins - 1)
+#         max_cnt = 0
+#         for i in range(bins):
+#             if i == 0:
+#                 dist["Bin_" + i] = df.filter((F.col(column_name) < (dist_min + (i + 1) * dist_stp))).count().collect()[0][0]
+#                 if dist["Bin_" + i] > max_cnt: max_cnt = dist["Bin_" + i]
+#             else: 
+#                 if i == bins:
+#                     dist["Bin_" + i] = df.filter((F.col(column_name) >= dist_min + i * dist_stp)).count().collect()[0][0]
+#                     if dist["Bin_" + i] > max_cnt: max_cnt = dist["Bin_" + i]
+#                 else:
+#                     dist["Bin_" + i] = df.filter((F.col(column_name) >= dist_min + i * dist_stp) & 
+#                                                 (F.col(column_name) < (dist_min + (i + 1) * dist_stp))).count().collect()[0][0]
+#                     if dist["Bin_" + i] > max_cnt: max_cnt = dist["Bin_" + i]
+        
+#         for i in range(bins):
+#             dist["Bin_" + i] = round((dist["Bin_" + i] / max_cnt) * 20) * '#'
+            
+#     return dist
+    
 
 ########################################################################
 ### Codebook Generation Process
@@ -109,7 +158,7 @@ if "study" in metadata:
 print(COLOUR_STEP + f'    {datetime.datetime.now()} :: Adding file level metadata...'.ljust(t_width) + COLOUR_REST)
 file_description = etree.SubElement(document_description, "fileDscr")
 file_name = os.path.basename(file_location + source_file)
-file_size = get_file_size(file_location + source_file)
+file_size = get_dir_size(file_location + source_file)
 row_count = df.count()
 column_count = len(df.columns)
 
@@ -159,12 +208,17 @@ print(COLOUR_TASK + f'>>> {datetime.datetime.now()} :: DDI Codebook completed an
 print(COLOUR_TASK + f'>>> {datetime.datetime.now()} :: Generate metadata PDF file...'.ljust(t_width) + COLOUR_REST)
 def generate_pdf(metadata, file_name, file_size, row_count, column_count):
     pdf = FPDF()
+    pdf.add_font("Times", style="", fname="C:/Users/5775620/Documents/FirmBackbone/pySpark_ETL/times.ttf", uni=True)
+    pdf.add_font("Times", style="B", fname="C:/Users/5775620/Documents/FirmBackbone/pySpark_ETL/timesbd.ttf", uni=True)
+    pdf.add_font("Times", style="I", fname="C:/Users/5775620/Documents/FirmBackbone/pySpark_ETL/timesi.ttf", uni=True)
+    pdf.add_font("Times", style="BI", fname="C:/Users/5775620/Documents/FirmBackbone/pySpark_ETL/timesbi.ttf", uni=True)
+
     pdf.set_auto_page_break(auto=True, margin=15)
     pdf.add_page()
-    pdf.set_font("Times", size=12)
+    pdf.set_font("Times", size=10)
 
     # Add title
-    pdf.set_font("Times", style="B", size=16)
+    pdf.set_font("Times", style="B", size=14)
     pdf.cell(0, 10, "Dataset Metadata Report", ln=True, align="C")
     pdf.ln(10)
 
@@ -173,29 +227,29 @@ def generate_pdf(metadata, file_name, file_size, row_count, column_count):
     if "study" in metadata:
         pdf.set_font("Times", style="B", size=14)
         pdf.cell(0, 10, "Study Information", ln=True)
-        pdf.set_font("Times", size=12)
+        pdf.set_font("Times", size=10)
         study = metadata["study"]
-        pdf.cell(0, 10, f"Title: {study.get('title', 'Unknown Title')}", ln=True)
-        pdf.cell(0, 10, f"ID: {study.get('id', 'Unknown ID')}", ln=True)
-        pdf.cell(0, 10, f"Producer: {study.get('producer', 'Unknown Producer')}", ln=True)
-        pdf.multi_cell(0, 10, f"Abstract: {study.get('abstract', 'No abstract provided')}")
-        pdf.cell(0, 10, f"License Terms: {study.get('license_terms', 'No license terms provided')}", ln=True)
+        pdf.cell(0, 5, f"Title: {study.get('title', 'Unknown Title')}", ln=True)
+        pdf.cell(0, 5, f"ID: {study.get('id', 'Unknown ID')}", ln=True)
+        pdf.cell(0, 5, f"Producer: {study.get('producer', 'Unknown Producer')}", ln=True)
+        pdf.multi_cell(0, 5, f"Abstract: {study.get('abstract', 'No abstract provided')}")
+        pdf.cell(0, 5, f"License Terms: {study.get('license_terms', 'No license terms provided')}", ln=True)
         pdf.ln(10)
 
     # Add file-level metadata
     print(COLOUR_STEP + f'    {datetime.datetime.now()} :: Adding file level metadata...'.ljust(t_width) + COLOUR_REST)
-    pdf.set_font("Times", style="B", size=14)
+    pdf.set_font("Times", style="B", size=12)
     pdf.cell(0, 10, "File Information", ln=True)
     pdf.set_font("Times", size=12)
-    pdf.cell(0, 10, f"Filename: {file_name}", ln=True)
-    pdf.cell(0, 10, f"File Size: {file_size} bytes", ln=True)
-    pdf.cell(0, 10, f"Row Count: {row_count}", ln=True)
-    pdf.cell(0, 10, f"Column Count: {column_count}", ln=True)
+    pdf.cell(0, 5, f"Filename: {file_name}", ln=True)
+    pdf.cell(0, 5, f"File Size: {file_size} bytes", ln=True)
+    pdf.cell(0, 5, f"Row Count: {row_count}", ln=True)
+    pdf.cell(0, 5, f"Column Count: {column_count}", ln=True)
     pdf.ln(10)
 
     # Add column-level metadata
     print(COLOUR_STEP + f'    {datetime.datetime.now()} :: Adding column level metadata...'.ljust(t_width) + COLOUR_REST)
-    pdf.set_font("Times", style="B", size=14)
+    pdf.set_font("Times", style="B", size=12)
     pdf.cell(0, 10, "Column Information", ln=True)
     pdf.set_font("Times", size=12)
     for column in df.schema:
@@ -205,28 +259,31 @@ def generate_pdf(metadata, file_name, file_size, row_count, column_count):
         description = column_metadata.get("description", "No description provided")        
         stats = compute_statistics(column_name, column_data_type)
 
-        pdf.set_font("Times", style="B", size=12)
-        pdf.cell(0, 10, f"Column: {column_name}", ln=True)
-        pdf.set_font("Times", size=12)
-        pdf.cell(0, 10, f"Type: {column_data_type}", ln=True)
-        pdf.multi_cell(0, 10, f"Description: {description}")
+        pdf.set_font("Times", style="B", size=10)
+        pdf.cell(0, 5, f"Column: {column_name}", ln=True)
+        pdf.set_font("Times", size=10)
+        pdf.cell(0, 5, f"Type: {column_data_type}", ln=True)
+        pdf.multi_cell(0, 5, f"Description: {description}")
         
         # Value Labels (if any)
         if "values" in column_metadata:
             print(COLOUR_STEP + f'    {datetime.datetime.now()} :: Adding column level metadata...'.ljust(t_width) + COLOUR_REST)
-            pdf.set_font("Times", style="B", size=12)
-            pdf.cell(40, 10, "Values: ", ln=True)
-            pdf.set_font("Times", size=12)
+            pdf.set_font("Times", style="B", size=10)
+            pdf.cell(40, 5, "Values: ", ln=True)
+            pdf.set_font("Times", size=10)
             for value, label in column_metadata["values"].items():
-                pdf.cell(20, 10, f"  {value}: ", ln=0)
-                pdf.cell(0, 10, label, ln=True)
+                pdf.cell(20, 5, f"  {value}: ", ln=0)
+                pdf.cell(0, 5, label, ln=True)
 
         # Add statistics in a table-like structure
-        pdf.cell(50, 10, "Statistic", border=1, ln=0, align="C")
-        pdf.cell(50, 10, "Value", border=1, ln=1, align="C")
+        pdf.set_font("Times", style="B", size=10)
+        pdf.cell(40, 5, "Statistics: ", ln=True)
+        pdf.set_font("Times", size=10)
+        pdf.cell(50, 5, "Statistic", border=1, ln=0, align="C")
+        pdf.cell(50, 5, "Value", border=1, ln=1, align="C")
         for stat_name, stat_value in stats.items():
-            pdf.cell(50, 10, stat_name, border=1, ln=0, align="C")
-            pdf.cell(50, 10, str(stat_value), border=1, ln=1, align="C")
+            pdf.cell(50, 5, stat_name, border=1, ln=0, align="C")
+            pdf.cell(50, 5, str(stat_value), border=1, ln=1, align="C")
         pdf.ln(5)
 
     # Save the PDF

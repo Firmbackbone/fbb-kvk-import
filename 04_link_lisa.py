@@ -27,7 +27,7 @@ COLOUR_REST = Fore.RESET + Back.RESET
 print(COLOUR_HEAD + '-' * t_width + COLOUR_REST)
 print(COLOUR_HEAD + '  Utrecht University    '.ljust(t_width) + COLOUR_REST)
 print(COLOUR_HEAD + '  FIRMBACKBONE v3.00    '.ljust(t_width) + COLOUR_REST)
-print(COLOUR_HEAD + '  20250121: LISA Linker  '.ljust(t_width) + COLOUR_REST)
+print(COLOUR_HEAD + '  20250121 - LISA Linker '.ljust(t_width) + COLOUR_REST)
 print(COLOUR_HEAD + f'  Start: {datetime.datetime.now()}'.ljust(t_width) + COLOUR_REST)
 print(COLOUR_HEAD + '-' * t_width + COLOUR_REST)
 
@@ -42,13 +42,13 @@ file_id = str(uuid.uuid4())
 
 # For the first KVK file for which we make a new backbone (2024 version since I believe the 2023 version is incorrect)
 source_backup = 'C:/Users/5775620/Documents/FirmBackbone/pySpark_ETL/'
-source_location = 'C:/Users/5775620/Documents/FirmBackbone/fbb-data/LISA/2021_2022/'
-source_file = 'LISA_2022_ibis.sav'
-source_csv_file = 'LISA_2022_ibis.csv'
-source_wave = '2024-12-03' # '2024-12-03'
+source_location = 'C:/Users/5775620/Documents/FirmBackbone/fbb-data/LISA/'
+source_file = 'LISA_2022.sav'       # 'LISA_2022_ibis.sav'
+source_csv_file = 'LISA_2022.csv'   # 'LISA_2022_ibis.csv'
+source_wave = '2024-12-04'          # ''2021-09-12' / '2024-12-03'
 source_provider = 'lisa'
 target_location = 'C:/Users/5775620/Documents/FirmBackbone/pySpark_ETL/'
-target_file = '20241203_lisa_2022'
+target_file = '20241204_lisa_2022'
 backbone_location = 'C:/Users/5775620/Documents/FirmBackbone/pySpark_ETL/'
 backbone_file = 'backbone_20231221_20240205'
 
@@ -63,7 +63,10 @@ print(COLOUR_TASK + f'>>> {datetime.datetime.now()} :: Backup source file...'.lj
 os.makedirs(os.path.dirname(source_backup + 'bronze/'), exist_ok=True)
 shutil.copyfile(source_location + source_file, 
                 source_backup + 'bronze/' + f'{file_id}_{source_file}')
-with open(source_location + f'{file_id}_{source_file}.txt', "w"):
+with open(source_location + f'{file_id}_{source_file}.txt', "w") as source_log:
+    source_log.write(f'Timestamp: {datetime.datetime.now()}\n')
+    source_log.write(f'Processed: {source_file}\n')
+    source_log.write(f'Processor: 20250121 - LISA Linker\n')
     pass
 
 print(COLOUR_TASK + f'>>> {datetime.datetime.now()} :: Initialize Spark...'.ljust(t_width) + COLOUR_REST)
@@ -349,6 +352,6 @@ spark.catalog.clearCache()
 spark.stop()
 
 print(COLOUR_HEAD + '-' * t_width + COLOUR_REST)
-print(COLOUR_HEAD + '  20250121: LISA Linker completed! '.ljust(t_width) + COLOUR_REST)
+print(COLOUR_HEAD + '  20250121 - LISA Linker completed! '.ljust(t_width) + COLOUR_REST)
 print(COLOUR_HEAD + f'  Finish: {datetime.datetime.now()}'.ljust(t_width) + COLOUR_REST)
 print(COLOUR_HEAD + '-' * t_width + COLOUR_REST)

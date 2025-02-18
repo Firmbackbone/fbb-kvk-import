@@ -1,0 +1,337 @@
+{
+    "study": {
+      "title": "FIRMBACKBONE: LISA Employment Survey",
+      "id": "FBB_20210912_LISA_2021_Complete",
+      "producer": "FIRMBACKBONE",
+      "abstract": "The FIRMBACKBONE: LISA Employment Survey dataset consists of all the companies that are surveyed by LISA. The data was obtained on November 27, 2024 and consists of the LISA survey results of 2021. The granularity level of this dataset is at the establishment level. The employment information is mostly retrieved from survey results but also imputation techniques and sometimes additional increases are reported (and documented).",
+      "license_terms": "FIRMBACKBONE License"
+    },
+    "columns": {
+      "fbb_id": {
+        "description": "Observation based identifier (UUID), used for record linkage, unique for each company and establishment combination."
+      },
+      "fbb_grp_id": {
+        "description": "Firm based identifier (UUID), used for record linkage and firm-based lineage."
+      },
+      "fbb_est_id": {
+        "description": "Establishment based identifier (UUID), used for record linkage and establishment-based lineage. Although some registrations are not considered an establishment (a long-term physical firm location), each location still gets an identifier by FIRMBACKBONE."
+      },
+      "fbb_row_id": {
+        "description": "Row based identifier (UUID), primarily used for duplicate checking."
+      },
+      "fbb_file_id": {
+        "description": "File based identifier (UUID), used for tracking source file lineage. For future reference, a file with the same code in its filename is stored in the bronze data location."
+      },
+      "fbb_wave_id": {
+        "description": "Date based identifier (YYYY-MM-DD) which is provided for each wave (containing the date of when the source snapshot was made)."
+      },
+      "fbb_updated": {
+        "description": "Date based column (YYYY-MM-DD) that holds the date when the record was added to the dataset."
+      },
+      "fbb_deleted": {
+        "description": "Date based column (YYYY-MM-DD) that holds the date when a new record was added that replaces the current row. The row is kept in the dataset for data lineage. This field should be blank exactly once for each unique fbb_id."
+      },
+      "fbb_source": {
+        "description": "Indicates the source (original provider) of the data."
+      },
+      "sbi_description": {
+        "description": "Description of the full standard business classification code (SBI-2008) provided (in Dutch). Details see: https://www.cbs.nl/en-gb/our-services/methods/classifications/activiteiten/standard-industrial-classifications"
+      },
+      "sbi_sectgor_int": {
+        "description": "Numerical value representing the standard business classification (NACE) sector.",
+        "values": {
+          "1": "Agriculture, Forestry and Fishing", 
+          "2": "Mining and Quarrying", 
+          "3": "Manufacturing", 
+          "4": "Electricity, Gas, Steam and Air Conditioning Supply", 
+          "5": "Water Supply; Sewerage, Waste Management and Remediation Activities", 
+          "6": "Construction", 
+          "7": "Wholesale and Retail Trade; Repair of Motor Vehicles and Motorcycles", 
+          "8": "Transportation and Storage", 
+          "9": "Accommodation and Food Service Activities", 
+          "10": "Information and Communication", 
+          "11": "Financial and Insurance Activities", 
+          "12": "Real Estate Activities", 
+          "13": "Professional, Scientific and Technical Activities", 
+          "14": "Administrative and Support Service Activities",
+          "15": "Public Administration and Defence; Compulsory Social Security",
+          "16": "Education",
+          "17": "Human Health and Social Work Activities",
+          "18": "Arts, Entertainment and Recreation",
+          "19": "Other Service Activities",
+          "20": "Activities of Households as Employers; Undifferentiated Goods and Services Producing Activities of Households for Own Use",
+          "21": "Activities of Extraterritorial Organisations and Bodies"
+        }
+      },
+      "sbi_sectgor_str": {
+        "description": "Single letter representing the standard business classification (NACE) sector.",
+        "values": {
+          "A": "Agriculture, Forestry and Fishing", 
+          "B": "Mining and Quarrying", 
+          "C": "Manufacturing", 
+          "D": "Electricity, Gas, Steam and Air Conditioning Supply", 
+          "E": "Water Supply; Sewerage, Waste Management and Remediation Activities", 
+          "F": "Construction", 
+          "G": "Wholesale and Retail Trade; Repair of Motor Vehicles and Motorcycles", 
+          "H": "Transportation and Storage", 
+          "I": "Accommodation and Food Service Activities", 
+          "J": "Information and Communication", 
+          "K": "Financial and Insurance Activities", 
+          "L": "Real Estate Activities", 
+          "M": "Professional, Scientific and Technical Activities", 
+          "N": "Administrative and Support Service Activities",
+          "O": "Public Administration and Defence; Compulsory Social Security",
+          "P": "Education",
+          "Q": "Human Health and Social Work Activities",
+          "R": "Arts, Entertainment and Recreation",
+          "S": "Other Service Activities",
+          "T": "Activities of Households as Employers; Undifferentiated Goods and Services Producing Activities of Households for Own Use",
+          "U": "Activities of Extraterritorial Organisations and Bodies"
+        }
+      },
+      "code_sbi_1": {
+        "description": "Full SBI-2008 business classification code, see: https://www.cbs.nl/en-gb/our-services/methods/classifications/activiteiten/standard-industrial-classifications"
+      },
+      "code_sbi_2": {
+        "description": "First 2-digits of the SBI-2008 business classification code, see: https://www.cbs.nl/en-gb/our-services/methods/classifications/activiteiten/standard-industrial-classifications"
+      },
+      "code_sbi_3": {
+        "description": "First 3-digits of the SBI-2008 business classification code, see: https://www.cbs.nl/en-gb/our-services/methods/classifications/activiteiten/standard-industrial-classifications"
+      },
+      "code_sbi_4": {
+        "description": "First 4-digits of the SBI-2008 business classification code, see: https://www.cbs.nl/en-gb/our-services/methods/classifications/activiteiten/standard-industrial-classifications"
+      },
+      "establishment_size_category": {
+        "description": "Indication of the overall size of the establishment given the number of fulltime jobs provided (parttime jobs are excluded), which is in-line with the Dutch Chamber of Commerce classification.",
+        "values": {
+          "00": "Unknown",
+          "01": "None",
+          "02": "1 - 1",
+          "03": "2 - 4",
+          "04": "5 - 9",
+          "05": "10 - 19",
+          "06": "20 - 49",
+          "07": "50 - 99",
+          "08": "100 - 199",
+          "09": "200 - 499",
+          "10": "500 - 799",
+          "11": "800 - 999",
+          "12": "1000+"
+        }
+      },
+      "number_of_jobs": {
+        "description": "Indicates number of full-time and part-time jobs provided by the establishment. Please note that this is not the same as the number of people (a person could have a contract and be self employed at the same time, resulting in 1 person having 2 jobs)."
+      },
+      "number_of_establishnents": {
+        "description": "This indicator counts the number of establishments that are part of the same company."
+      },
+      "employees_fulltime": {
+        "description": "The number of full-time employees that are working at a specific establishment. An employee is considered full-time when active for at least 12 hours per week (which is in-line with the definition by Statistics Netherlands)."
+      },
+      "employees_parttime": {
+        "description": "The number of part-time employees that are working at a specific establishment. An employee is considered full-time when active less than 12 hours per week (which is in-line with the definition by Statistics Netherlands)."
+      },
+      "employees_female": {
+        "description": "The total number of female employees working at the establishment."
+      },
+      "employees_female_fulltime": {
+        "description": "The total number of female employees working full-time (>=12 hours per week) at the establishment."
+      },
+      "employees_female_parttime": {
+        "description": "The total number of female employees working part-time (<12 hours per week)at the establishment."
+      },
+      "employees_male": {
+        "description": "The total number of male employees working at the establishment."
+      },
+      "employees_male_fulltime": {
+        "description": "The total number of male employees working full-time (>=12 hours per week) at the establishment."
+      },
+      "employees_male_parttime": {
+        "description": "The total number of male employees working part-time (<12 hours per week) at the establishment."
+      },
+      "bag_object_surface": {
+        "description": "This variable indicates the total area of the workspace in square meters."
+      },
+      "bag_object_usage": {
+        "description": "This indicates to what purpose or function the object is associated.",
+        "values": {
+          "00": "Unknown Function",
+          "01": "Residential Function",
+          "02": "Meeting Function",
+          "03": "Jail Function",
+          "04": "Healthcare Function",
+          "05": "Industrial Function",
+          "06": "Office Function",
+          "07": "Accommodation Function",
+          "08": "Educational Function",
+          "09": "Sports Function",
+          "10": "Shopping Function",
+          "11": "Other Functions",
+          "12": "Multiple Functions",
+          "13": "Stand Location",
+          "14": "Berth"
+        }
+      },
+      "establishment_pc4": {
+        "description": "The first 4 digits of the postal code of the establishment."
+      },
+      "establishment_code_corop": {
+        "description": "Code of the region as defined by Statistics Netherlands, see: https://www.cbs.nl/nl-nl/achtergrond/2023/10/kaarten-regionale-indelingen-2023."
+      },
+      "establishment_code_labor_region": {
+        "description": "Code of the region as defined by the Dutch Employee Insurance Agency (UWV), see: https://www.samenvoordeklant.nl/sites/default/files/bestandsbijlage/Arbeidsmarktregio%27s_vs_08-12-2022.pdf.",
+        "values": {
+          "01": "Groningen",
+          "02": "Friesland",
+          "03": "Noord-Holland Noord",
+          "04": "Drenthe",
+          "05": "Regio Zwolle",
+          "06": "Flevoland",
+          "07": "Zaanstreek/Waterland",
+          "08": "Zuid-Kennemerland en IJmond",
+          "09": "Twente",
+          "10": "Groot Amsterdam",
+          "11": "Stedendriehoek en Noordwest Veluwe",
+          "12": "Gooi en Vechtstreek",
+          "13": "Holland Rijnland",
+          "14": "Midden-Utrecht",
+          "15": "Amersfoort",
+          "16": "FoodValley",
+          "17": "Achterhoek",
+          "18": "Zuid-Holland Centraal ",
+          "19": "Midden-Holland",
+          "20": "Haaglanden",
+          "21": "Midden-Gelderland",
+          "22": "Rijnmond",
+          "23": "Rivierenland",
+          "24": "Gorinchem",
+          "25": "Rijk van Nijmegen",
+          "26": "Drechtsteden",
+          "27": "Noordoost-Brabant",
+          "28": "West-Brabant",
+          "29": "Zeeland",
+          "30": "Midden-Brabant",
+          "31": "Noord-Limburg",
+          "32": "Helmond-De Peel",
+          "33": "Zuidoost-Brabant",
+          "34": "Midden-Limburg",
+          "35": "Zuid-Limburg"
+        }
+      },
+      "establishment_code_municipality": {
+        "description": "A 4-digit code, in some other sources preceded by GM, of the municipality as defined by the Dutch government. See for a full list or more details: https://www.cbs.nl/nl-nl/onze-diensten/methoden/classificaties/overig/gemeentelijke-indelingen-per-jaar/indeling-per-jaar/gemeentelijke-indeling-op-1-januari-2024"
+      },
+      "establishment_code_province": {
+        "description": "A 2-digit code, in some other sources preceded by PV, of the province as defined by the Dutch government.",
+        "values": {
+          "20": "Groningen",
+          "21": "Friesland",
+          "22": "Drenthe",
+          "23": "Overijssel",
+          "24": "Flevoland",
+          "25": "Gelderland",
+          "26": "Utrecht",
+          "27": "Noord-Holland",
+          "28": "Zuid-Holland",
+          "29": "Zeeland",
+          "30": "Noord-Brabant",
+          "31": "Limburg"
+        }
+      },
+      "establishment_name_corop": {
+        "description": "Name of the COROP region as assigned by Statistics Netherlands, see: https://www.cbs.nl/nl-nl/achtergrond/2023/10/kaarten-regionale-indelingen-2023."
+      },
+      "establishment_name_labor_region": {
+        "description": "Name of the region as defined by the Dutch Employee Insurance Agency (UWV), see: https://www.samenvoordeklant.nl/sites/default/files/bestandsbijlage/Arbeidsmarktregio%27s_vs_08-12-2022.pdf."
+      },
+      "establishment_name_lisa_region": {
+        "description": "Name of the region that LISA uses to collect the data (administrative purposes)."
+      },
+      "establishment_name_municipality": {
+        "description": "Name of the municipality as defined by the Dutch government. See for a full list or more details: https://www.cbs.nl/nl-nl/onze-diensten/methoden/classificaties/overig/gemeentelijke-indelingen-per-jaar/indeling-per-jaar/gemeentelijke-indeling-op-1-januari-2024"
+      },
+      "establishment_name_province": {
+        "description": "Name of the province as defined by the Dutch government."
+      },
+      "counts_raised": {
+        "description": "In case of non-response to the survey, within the categories male/female and full-time/part-time, the number of employees is adjusted relative to companies with a similar size category.",
+        "values": {
+          "TRUE": "The counts are adjusted (increased)",
+          "FALSE": "The counts are not adjusted (not increased)"
+        }
+      },
+      "lisa_survey_type": {
+        "description": "There are different types of surveys conducted by LISA, which are indicated here.",
+        "values": {
+          "00": "Unknown",
+          "01": "Data directly from company, statement per branch, obtained in writing, online or by telephone",
+          "08": "Data directly from company, temporarily no employees",
+          "09": "Data from external source",
+          "11": "Data directly from company, statement per branch, through the intervention of a third party authorised by LISA (e.g. Prosu)",
+          "20": "Data directly from company total statement, to be allocated to branches",
+          "30": "Data from secondary source per branch (e.g. KVK (recent), annual report, website, press release)",
+          "40": "Data from secondary source total, to be allocated to branches",
+          "50": "Data increased (with VR management increase module)",
+          "60": "Data imputed (with VR management imputation module)",
+          "51": "Data increased (other method)",
+          "61": "Data imputed (other method)",
+          "62": "Data constructed on the basis of location property (BAG surface, Google Streetview)v",
+          "72": "Data estimated, guesswork method",
+          "73": "Data taken over from last year",
+          "74": "Old 04 survey type (only to be used for conversion of older years)",
+          "76": "Data taken over from next year"
+        }
+      },
+      "survey_content_year": {
+        "description": "The last two digits of the year for which the survey was filled out."
+      },
+      "survey_form_received": {
+        "description": "Indicates if the establishment has received a survey form.",
+        "values": {
+          "TRUE": "The establishment has received a survey form.",
+          "FALSE": "The establishment has not received a survey form."
+        }
+      },
+      "survey_registration": {
+        "description": "Indicates how the establishment has provided the information.",
+        "values": {
+          "00": "Unknown",
+          "01": "Via mail",
+          "02": "Via telephone",
+          "03": "Via affiliation partner",
+          "04": "Via national coordinator",
+          "05": "Via internet",
+          "06": "Via reading scan file",
+          "07": "Via external telephone survey",
+          "08": "Via estimate based on Chamber of Commerce data",
+          "09": "Via Chamber of Commerce",
+          "10": "Via reminder",
+          "11": "Via facade inspection",
+          "12": "Via regional coordinator",
+          "13": "Via internal organization",
+          "14": "Via the media",
+          "15": "Via manual increase",
+          "58": "Via agricultural survey Prosu",
+          "59": "Increase via agricultural survey Prosu"
+        }
+      },
+      "month_lisa_processed": {
+        "description": "The month in which the LISA survey was processed."
+      },
+      "year_lisa_processed": {
+        "description": "The year in which the LISA survey was processed."
+      },
+      "month_cancelled": {
+        "description": "The month in which the establishment was cancelled (when originally included in the survey respondents). In the next survey wave, the cancelled establishment is not surveyed any more."
+      },
+      "year_cancelled": {
+        "description": "The year in which the establishment was cancelled  (when originally included in the survey respondents). In the next survey wave, the cancelled establishment is not surveyed any more."
+      },
+      "month_founded": {
+        "description": "The month in which the company was founded."
+      },
+      "year_founded": {
+        "description": "The year in which the company was founded."
+      }
+    }
+  }

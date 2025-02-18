@@ -2,9 +2,10 @@ import pyspark.sql.functions as f
 from pyspark.sql.types import StringType, IntegerType, BooleanType
 from pyspark.sql.functions import year, month, dayofmonth
 from pyspark.sql.functions import regexp_extract, regexp_replace, row_number
-from pyspark.sql.functions import when, coalesce, length, trim, concat, lit
+from pyspark.sql.functions import when, coalesce, length, trim, concat, lit, udf
 from pyspark.sql.functions import lower, count, when, current_date, greatest
 from pyspark.sql.functions import col, row_number, first, last, collect_set, size
+from pyspark.sql.types import StringType
 from pyspark.sql.window import Window
 
 import re
@@ -559,6 +560,208 @@ def df_create_combined_address(x, colCombi = 'fbb_combined_address', cols = __co
 
     return x       
 
+__country_codes = {
+    '0001': 'NLD',
+    '0002': 'BEL',
+    '0003': 'FRA',
+    '0004': 'DEU',
+    '0005': 'ITA',
+    '0006': 'LUX',
+    '0007': 'MCO',
+    '0008': 'LIE',
+    '0009': 'SMR',
+    '0020': 'GGN',
+    '0022': 'GBR',
+    '0024': 'ISL',
+    '0026': 'NOR',
+    '0028': 'IRL',
+    '0030': 'SWE',
+    '0032': 'FIN',
+    '0034': 'DNK',
+    '0036': 'CHE',
+    '0038': 'AUT',
+    '0040': 'PRT',
+    '0042': 'ESP',
+    '0043': 'AND',
+    '0046': 'MLT',
+    '0047': 'BIH',
+    '0050': 'GRC',
+    '0052': 'TUR',
+    '0053': 'EST',
+    '0054': 'LTA',
+    '0055': 'LTU',
+    '0057': 'ARM',
+    '0059': 'HRV',
+    '0060': 'POL',
+    '0061': 'GEO',
+    '0063': 'SVN',
+    '0064': 'HUN',
+    '0066': 'ROU',
+    '0067': 'CZE',
+    '0068': 'BGR',
+    '0069': 'SVK',
+    '0070': 'ALB',
+    '0082': 'FRO',
+    '0083': 'BIG',
+    '0085': 'DEU',
+    '0086': 'AZE',
+    '0087': 'KAZ',
+    '0089': 'MDA',
+    '0090': 'UZB',
+    '0092': 'TKM',
+    '0093': 'RUS',
+    '0094': 'UKR',
+    '0095': 'BLR',
+    '0096': 'MKD',
+    '0204': 'MAR',
+    '0212': 'TUN',
+    '0216': 'LBY',
+    '0220': 'EGY',
+    '0224': 'SDN',
+    '0232': 'MLI',
+    '0247': 'CPV',
+    '0248': 'SEN',
+    '0264': 'SLE',
+    '0272': 'CIV',
+    '0273': 'BFA',
+    '0276': 'GHA',
+    '0280': 'TGO',
+    '0285': 'BEN',
+    '0288': 'NGA',
+    '0302': 'CMR',
+    '0314': 'GAB',
+    '0318': 'COD',
+    '0324': 'RWA',
+    '0329': 'SHN',
+    '0330': 'AGO',
+    '0334': 'ETH',
+    '0342': 'SOM',
+    '0346': 'KEN',
+    '0350': 'UGA',
+    '0352': 'TZA',
+    '0355': 'SYC',
+    '0366': 'MOZ',
+    '0373': 'MUS',
+    '0378': 'ZMB',
+    '0383': 'ZWE',
+    '0390': 'ZAF',
+    '0391': 'BWA',
+    '0392': 'NAM',
+    '0400': 'USA',
+    '0404': 'CAN',
+    '0412': 'MEX',
+    '0413': 'BMU',
+    '0416': 'GTM',
+    '0422': 'BLZ',
+    '0428': 'SLV',
+    '0432': 'NIC',
+    '0436': 'CRI',
+    '0440': 'PAN',
+    '0451': 'COG',
+    '0453': 'BHS',
+    '0456': 'DOM',
+    '0458': 'CYM',
+    '0464': 'JAM',
+    '0467': 'PRI',
+    '0468': 'KNA',
+    '0469': 'BRB',
+    '0474': 'ABW',
+    '0480': 'COL',
+    '0484': 'VEN',
+    '0492': 'SUR',
+    '0500': 'ECU',
+    '0504': 'PER',
+    '0508': 'BRA',
+    '0512': 'CHL',
+    '0516': 'BOL',
+    '0520': 'PRY',
+    '0524': 'URY',
+    '0528': 'ARG',
+    '0600': 'CYP',
+    '0604': 'LBN',
+    '0608': 'SYR',
+    '0612': 'IRQ',
+    '0616': 'IRN',
+    '0624': 'ISR',
+    '0628': 'JOR',
+    '0632': 'SAU',
+    '0636': 'KWT',
+    '0640': 'BHR',
+    '0644': 'QAT',
+    '0647': 'ARE',
+    '0649': 'OMN',
+    '0660': 'PAK',
+    '0664': 'IND',
+    '0666': 'BGD',
+    '0670': 'LKA',
+    '0672': 'NPL',
+    '0680': 'THA',
+    '0687': 'VNM',
+    '0696': 'KHM',
+    '0700': 'IDN',
+    '0701': 'MYS',
+    '0706': 'SGP',
+    '0708': 'PHL',
+    '0720': 'CHN',
+    '0728': 'KOR',
+    '0732': 'JPN',
+    '0737': 'TWN',
+    '0800': 'AUS',
+    '0804': 'NZL',
+    '0817': 'TON',
+    '5103': 'SRB',
+    '5104': 'MNE',
+    '5105': 'XKX',
+    '5106': 'BES',
+    '5107': 'CUW',
+    '5110': 'MAF',
+    '7030': 'VGB',
+    '8035': 'IMN',
+    '8036': 'BWI',
+    '8045': 'ATG',
+    '9056': 'MHL',
+    '9090': 'VUT'
+}
+
+def map_country(country):
+    return __country_codes.get(country, 'UDF')
+
+map_country_udf = udf(map_country, StringType())
+
+def df_create_iso3c(x, source_col = 'correspondence_code_country', target_col = 'correspondence_code_iso3c', mapping = __country_codes):
+    """Convert the Chamber of Commerce countries to ISO3
+    
+    Description: The Chamber of Commerce uses different, non-traditional
+        country codes. This function converts them into an ISO3c standard
+        notation. In case the code cannot be found in the provided list, 
+        a NULL value will be placed. The source column refers to the original
+        Chamber of Commerce codes column, the target column is the new
+        column name. The mapping can be replaced with an alternative dict.
+
+    Args:
+        x (Spark Dataframe):
+        source_col (String):
+        target_col (String):
+        mapping (Dict):
+    Returns:
+        Spark Dataframe: The updated dataframe with the new column.
+    """
+    print(f'    {datetime.datetime.now()} >> df_create_iso3c()')
+    if source_col not in x.columns: 
+        print(f'    {datetime.datetime.now()} !! Incorrect format of source data (x), column {source_col} is missing.')
+        raise Exception(f'Incorrect format of source data (x), column {source_col} is missing.')
+    if target_col in x.columns: 
+        print(f'    {datetime.datetime.now()} !! Target column {target_col} is already part of the source data (x).')
+        raise Exception(f'Target column {target_col} is already part of the source data (x).')
+
+
+    mapping_expr = when(col(source_col).isNull(), None)
+    for key, value in mapping.items():
+        mapping_expr = mapping_expr.when(col(source_col) == key, value)
+    mapping_expr = mapping_expr.otherwise(col(source_col))
+    x = x.withColumn(target_col, mapping_expr)    
+    
+    return x
 
 ########################################################################
 ### Match and retrieve or create FBB identifiers
@@ -576,34 +779,6 @@ def df_sort_columns(x):
     x.select(sorted(x.columns))
     return x
     
-# __group_id_col = 'case_id'
-
-# def df_lookup_group_ids(x, y, group_id = __group_id_col, overwrite:bool = False):
-#     # Now, from the backbone we create a list of distinct case_id's with 
-#     # the associated fbb_grp_id. There should not be any duplicates 
-#     # (the case_idf and fbb_grp_id should uniquely match).
-#     print(f'    {datetime.datetime.now()} >> df_lookup_group_ids()')
-#     y = y.select('case_id', 'fbb_grp_id').distinct()
-#     y = y.withColumnRenamed('case_id', 'backbone_case_id')
-#     y = y.withColumnRenamed('fbb_grp_id', 'backbone_fbb_grp_id')
-
-#     duplicate_cases = int(y.select('backbone_case_id').groupBy('backbone_case_id').count().where(f.col('count') > 1).select(f.sum('count')).collect()[0][0] or 0)    
-#     print(f'    {datetime.datetime.now()} :: Duplicate count is: {duplicate_cases}')
-    
-#     if duplicate_cases > 0:
-#         raise Exception(f'There are {duplicate_cases} duplicate case_ids found in the backbone data (y), this should not be allowed, please check te backbone.')
-#     if group_id not in x.columns:
-#         raise Exception(f'The grouping column {group_id} is not found in the source dataset, no group matching can be executed.')
-    
-#     x = x.join(y, x[group_id] == y['backbone_case_id'], 'left')
-#     if overwrite:
-#         x = x.withColumn('fbb_grp_id', col('backbone_fbb_grp_id'))
-#     else:
-#         x = x.withColumn('fbb_grp_id', coalesce('fbb_grp_id', 'backbone_fbb_grp_id'))
-#     x = x.drop('backbone_case_id')
-#     x = x.drop('backbone_fbb_grp_id')
-#     return x
-
 __test_cols = {
     'case_id' : 'case_id',
     'establishment_id' : 'establishment_id'
@@ -691,6 +866,15 @@ def df_exact_match(x, y, mapping:dict = __test_cols, threshold:int = 0, allow_nu
     # matches, which should not happen in general.
     x = x.withColumn('merge_row_id', f.expr('uuid()'))
     x.cache()
+    
+    ### The join below could be an issue, since sometimes there could be
+    # many (duplicate) mappings. Yet, I would expect that these would result
+    # in many duplicates of the newly created merge_row_id, but perhaps
+    # there is a caching issue and the generated ID's are re-generated.
+    # To ensure that the caching issue does not occur, we need to persists
+    # the data prior to doing the join(), e.g. by doing a count() which is
+    # very time consuming but apparently required...
+    # x.count()
     
     # Now let's find exact matches in the current data. 
     # Clearly, since the backbone has historic data, we can get duplicate
@@ -782,6 +966,13 @@ def df_generate_ids(x, y = None, id_col = None, key_cols = None, force = False, 
                 print(f'    {datetime.datetime.now()} !! Incorrect specification of id and key columns in backbone (y): column {c} is missing.')
                 raise Exception(f'!! Incorrect specification of id and key columns in backbone(y): column {c} is missing.')
 
+    ### Prepare the source data:
+    # We cannot enforce that the source table has row_ids so we make them 
+    # to ensure uqniueness. This column can be used to identify duplicate
+    # matches, which should not happen in general.
+    x = x.withColumn('merge_row_id', f.expr('uuid()'))
+    x.cache()
+
     # Generate a UUID for each distinct combination of key_cols
     x_lst = x.select(*key_cols).distinct()
     if not allow_nulls:
@@ -824,6 +1015,17 @@ def df_generate_ids(x, y = None, id_col = None, key_cols = None, force = False, 
             x = x.drop('x_uuid', 'y_uuid')
             y_lst.unpersist()
     x_lst.unpersist()
+    
+    # Create a window function in which we iterate the rows for each
+    # unique merge_row_id and y_fbb_id, order by date_deleted. 
+    # Then we filter only the rows that are the first row and we drop
+    # the row iterator again. If there are multiple different fbb_ids
+    # available, we will assume that the latest is the greatest...
+    ws  = Window.partitionBy('merge_row_id').orderBy('fbb_deleted', 'fbb_max_date', 'fbb_wave_id')
+    x = x.withColumn('row_iterator', row_number().over(ws))
+    x = x.filter(col('row_iterator') == 1)
+    x = x.drop('row_iterator')
+
     return x
 
 def df_generate_fbb_ids(x, print_output = False):
@@ -1204,7 +1406,7 @@ __bb_cols = ['fbb_id', 'fbb_grp_id', 'fbb_est_id', 'fbb_row_id', 'fbb_file_id', 
              'case_id', 'establishment_id', 'hq_indicator', 'company_name', 'establishment_name', 'partnership_name', 'code_legal_form', 'description_legal_form', 
              'establishment_dissolved', 'company_dissolved', 'code_status_legal', 
              'establishment_street', 'establishment_number', 'establishment_extension', 'establishment_postcode', 'establishment_pc4', 'establishment_city', 'establishment_code_municipality', 
-             'correspondence_street', 'correspondence_number', 'correspondence_extension', 'correspondence_postcode', 'correspondence_pc4', 'correspondence_city', 'correspondence_code_municipality', 'correspondence_code_country', 
+             'correspondence_street', 'correspondence_number', 'correspondence_extension', 'correspondence_postcode', 'correspondence_pc4', 'correspondence_city', 'correspondence_code_municipality', 'correspondence_code_country', 'correspondence_code_iso3c',
              'kvk_city', 'employees_fulltime', 'employees_parttime', 'employees_total', 'date_employees', 'employment_total', 'date_employment', 
              'code_sbi_1', 'code_sbi_2', 'code_sbi_3', 'economically_active', 
              'registered_corporate_structure', 'indication_import', 'indication_export', 'date_founded', 'date_on_deed', 'date_registration', 'code_registration', 'date_cancellation', 'code_cancellation', 'code_deregistration', 'code_dissolution', 

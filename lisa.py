@@ -69,13 +69,13 @@ __all_cols = {
     'arbeidnaam' : 'establishment_name_labor_region',
     'regcode' : 'establishment_code_lisa_region',
     'regnaam' : 'establishment_name_lisa_region',
-    'sectie' : 'code_sbi_section', # A, B, C, ...
-    'afdeling' : 'code_sbi_department', # First 2 digits
-    'sbi08_3' : 'sbi_code_group', # First 3 digits
-    'sbi08_4' : 'sbi_code_class', # First 4 digits
+    'sectie' : 'sbi_sector_str', # A, B, C, ...
+    'afdeling' : 'code_sbi_2', # First 2 digits
+    'sbi08_3' : 'code_sbi_3', # First 3 digits
+    'sbi08_4' : 'code_sbi_4', # First 4 digits
     'sbi08' : 'code_sbi_1', # Full SBI code (similar to in KVK)
-    'omschr' : 'code_sbi_description',
-    'sector' : 'code_sbi_sector', # Similar to code_sbi_section but numerical
+    'omschr' : 'sbi_description',
+    'sector' : 'sbi_sector_int', # Similar to code_sbi_section but numerical
     'rin_nummer' : 'remove_governmental_identification', # SHOULD BE REMOVED
     'plan_naam' : 'remove_plan_naam', # Don't know...
     'wloc_type' : 'remove_wloc_type', # Don't know...
@@ -1008,7 +1008,7 @@ def df_append_fbb_ids(x, y):
 
 ########################################################################
 ### Deduplicate the dataframe
-########################################################################
+####################################*####################################
 
 __full_duplicate_cols = ['lisa_id', 'case_id', 'establishment_id', 'establishment_name', 
                          'establishment_number', 'establishment_letter', 'establishment_extension', 
