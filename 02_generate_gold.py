@@ -33,7 +33,7 @@ print(COLOUR_TASK + f'>>> Loading configuration...'.ljust(t_width) + COLOUR_REST
 file_id = str(uuid.uuid4())
 
 # For the second KVK file (older one for testing purposes) for which we merge with the backbone
-source_location = 'C:/Users/5775620/Documents/FirmBackbone/pySpark_ETL/'
+source_location = 'C:/Users/<user>/Documents/FirmBackbone/pySpark_ETL/'
 source_file = '20240205_kvk'
 
 print(COLOUR_TASK + f'>>> Initialize Spark...'.ljust(t_width) + COLOUR_REST)
