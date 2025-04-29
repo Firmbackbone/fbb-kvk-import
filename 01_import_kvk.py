@@ -37,30 +37,30 @@ print(COLOUR_TASK + f'>>> {datetime.datetime.now()} :: Loading configuration...'
 file_id = str(uuid.uuid4())
 
 # For the first KVK file for which we make a new backbone (2024 version since I believe the 2023 version is incorrect)
-# source_location = 'C:/Users/5775620/Documents/FirmBackbone/fbb-data/20231221 - KvK/BASIS/'
+# source_location = 'C:/Users/<user>/Documents/FirmBackbone/fbb-data/20231221 - KvK/BASIS/'
 # source_file = 'BASIS.csv'
 # # source_file = 'basis_sample_extra.csv'
 # source_wave = '2023-12-21'
 # source_provider = 'kvk'
-# target_location = 'C:/Users/5775620/Documents/FirmBackbone/pySpark_ETL/'
+# target_location = 'C:/Users/<user>/Documents/FirmBackbone/pySpark_ETL/'
 # target_file = '20231221_kvk'
 # create_backbone = True
-# backbone_location = 'C:/Users/5775620/Documents/FirmBackbone/pySpark_ETL/'
+# backbone_location = 'C:/Users/<user>/Documents/FirmBackbone/pySpark_ETL/'
 # backbone_file = 'backbone'
-# source_backup = 'C:/Users/5775620/Documents/FirmBackbone/pySpark_ETL/'
+# source_backup = 'C:/Users/<user>/Documents/FirmBackbone/pySpark_ETL/'
 
 # For the second KVK file (older one for testing purposes) for which we merge with the backbone
-source_location = 'C:/Users/5775620/Documents/FirmBackbone/fbb-data/20240205 - KvK/'
+source_location = 'C:/Users/<user>/Documents/FirmBackbone/fbb-data/20240205 - KvK/'
 source_file = 'BASIS.csv'
 source_wave = '2024-02-05'
 source_provider = 'kvk'
-target_location = 'C:/Users/5775620/Documents/FirmBackbone/pySpark_ETL/'
+target_location = 'C:/Users/<user>/Documents/FirmBackbone/pySpark_ETL/'
 target_file = '20240205_kvk'
 create_backbone = False
-backbone_location = 'C:/Users/5775620/Documents/FirmBackbone/pySpark_ETL/'
+backbone_location = 'C:/Users/<user>/Documents/FirmBackbone/pySpark_ETL/'
 # backbone_file = 'backbone_20231221'
 backbone_file = 'backbone_20231221'
-source_backup = 'C:/Users/5775620/Documents/FirmBackbone/pySpark_ETL/'
+source_backup = 'C:/Users/<user>/Documents/FirmBackbone/pySpark_ETL/'
 
 ########################################################################
 ### Create a copy of the source file in bronze
