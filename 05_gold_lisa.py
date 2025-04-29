@@ -45,9 +45,9 @@ print(COLOUR_TASK + f'>>> {datetime.datetime.now()} :: Loading configuration...'
 file_id = str(uuid.uuid4())
 
 # For the first KVK file for which we make a new backbone (2024 version since I believe the 2023 version is incorrect)
-source_location = 'C:/Users/5775620/Documents/FirmBackbone/pySpark_ETL/'
+source_location = 'C:/Users/<user>/Documents/FirmBackbone/pySpark_ETL/'
 source_file = '20241204_lisa_2022'
-backbone_location = 'C:/Users/5775620/Documents/FirmBackbone/pySpark_ETL/'
+backbone_location = 'C:/Users/<user>/Documents/FirmBackbone/pySpark_ETL/'
 backbone_file = 'backbone_20231221_20240205'
 
 print(COLOUR_TASK + f'>>> Initialize Spark...'.ljust(t_width) + COLOUR_REST)
