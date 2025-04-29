@@ -4,7 +4,7 @@
 
 ## KVK Import Script
 
-This repository consists of several PySpark scripts that import KVK data into the backbone (or createes a new one), generates gold datasets for selected subsets and generates DDI 2.5 compliant metadata in XML format as well 
+This repository consists of several PySpark scripts that import KVK data into the backbone (or creates a new one), generates gold datasets for selected subsets and generates DDI 2.5 compliant metadata in XML format as well 
 as in PDF. For the scripts to work, a version of Apache Spark must be accessible (currently only a locally hosted Spark is used). Some additional packages are required:
 
 - `colorama==0.4.6` (used for the color scheme on the terminal window's logging)
