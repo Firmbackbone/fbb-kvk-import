@@ -7,13 +7,13 @@
 This repository consists of several PySpark scripts that import KVK data into the backbone (or createes a new one), generates gold datasets for selected subsets and generates DDI 2.5 compliant metadata in XML format as well 
 as in PDF. For the scripts to work, a version of Apache Spark must be accessible (currently only a locally hosted Spark is used). Some additional packages are required:
 
-- colorama==0.4.6 (used for the color scheme on the terminal window's logging)
-- findspark==2.0.1 (used for configuring the locally hosted Spark sessions)
-- fpdf==1.7.2 (used for generating the metadata into a human readable PDF file)
-- lxml==5.3.0 (used for generating the metadata into a DDI 2.5 compliant XML file)
-- pyspark==3.5.1 (used for most data actions, executed on an Apache Spark instance)
-- pyspark==3.5.3 (used for most data actions, executed on an Apache Spark instance)
-- numpy==1.26.4 (in case of SPSS file, Spark is not compatible with numpy>2)
+- `colorama==0.4.6` (used for the color scheme on the terminal window's logging)
+- `findspark==2.0.1` (used for configuring the locally hosted Spark sessions)
+- `fpdf==1.7.2` (used for generating the metadata into a human readable PDF file)
+- `lxml==5.3.0` (used for generating the metadata into a DDI 2.5 compliant XML file)
+- `pyspark==3.5.1` (used for most data actions, executed on an Apache Spark instance)
+- `pyspark==3.5.3` (used for most data actions, executed on an Apache Spark instance)
+- `numpy==1.26.4` (in case of SPSS file, Spark is not compatible with numpy>2)
 
 To work with the scripts, please read the documentation within the code carefully. The scripts are numbered in terms of execution order. The first script copies the data into the bronze folder and updates the backbone with the changes, after it links the source data with the backbone identifiers and saves a full copy in the silver data. The second script, subsets the data and filters for specific elements prior to storing the speudonimized data into the gold folder. Finally the third script generates the XML and PDF metadata in DDI 2.5 compatible format.
 
