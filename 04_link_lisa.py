@@ -41,15 +41,15 @@ print(COLOUR_TASK + f'>>> {datetime.datetime.now()} :: Loading configuration...'
 file_id = str(uuid.uuid4())
 
 # For the first KVK file for which we make a new backbone (2024 version since I believe the 2023 version is incorrect)
-source_backup = 'C:/Users/5775620/Documents/FirmBackbone/pySpark_ETL/'
-source_location = 'C:/Users/5775620/Documents/FirmBackbone/fbb-data/LISA/'
+source_backup = 'C:/Users/<user>/Documents/FirmBackbone/pySpark_ETL/'
+source_location = 'C:/Users/<user>/Documents/FirmBackbone/fbb-data/LISA/'
 source_file = 'LISA_2022.sav'       # 'LISA_2022_ibis.sav'
 source_csv_file = 'LISA_2022.csv'   # 'LISA_2022_ibis.csv'
 source_wave = '2024-12-04'          # ''2021-09-12' / '2024-12-03'
 source_provider = 'lisa'
-target_location = 'C:/Users/5775620/Documents/FirmBackbone/pySpark_ETL/'
+target_location = 'C:/Users/<user>/Documents/FirmBackbone/pySpark_ETL/'
 target_file = '20241204_lisa_2022'
-backbone_location = 'C:/Users/5775620/Documents/FirmBackbone/pySpark_ETL/'
+backbone_location = 'C:/Users/<user>/Documents/FirmBackbone/pySpark_ETL/'
 backbone_file = 'backbone_20231221_20240205'
 
 ########################################################################
