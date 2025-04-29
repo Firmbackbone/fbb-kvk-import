@@ -35,7 +35,7 @@ print(COLOUR_HEAD + '-' * t_width + COLOUR_REST)
 print(COLOUR_TASK + f'>>> {datetime.datetime.now()} :: Loading configuration...'.ljust(t_width) + COLOUR_REST)
 
 # Paths to input files
-file_location = 'C:/Users/5775620/Documents/FirmBackbone/pySpark_ETL/gold/'
+file_location = 'C:/Users/<user>/Documents/FirmBackbone/pySpark_ETL/gold/'
 # source_file = '20241203_lisa_2021_complete'
 source_file = '20231221_kvk_complete'
 codebook_xml_file = f'ddi_{source_file}.xml'
